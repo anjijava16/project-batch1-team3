@@ -1,5 +1,5 @@
 package com.orienit.hadoop.training;
-
+// welcome to hadoop word
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;

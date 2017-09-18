@@ -19,7 +19,6 @@ public class XMLProcessing {
   job.setJarByClass(XMLProcessing.class);
   job.setOutputKeyClass(Text.class);
   job.setOutputValueClass(Text.class);
-  job.setNumReduceTasks(0);
   job.setMapperClass(Map.class);
   job.setNumReduceTasks(0);
 

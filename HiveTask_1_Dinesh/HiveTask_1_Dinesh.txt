@@ -1,0 +1,33 @@
+//////////////////////////////////// 1. HiveTask_1: xml////////////////////////////////////
+<student><name>anil</name><id>1</id><course>spark</course><year>2016</year></student>
+<student><name>venkat</name><id>2</id><course>spark</course><year>2016</year></student>
+<student><name>raj</name><id>3</id><course>spark</course><year>2016</year></student>
+<student><name>sunil</name><id>4</id><course>hadoop</course><year>2015</year></student>
+<student><name>anvith</name><id>5</id><course>hadoop</course><year>2015</year></student>
+<student><name>dev</name><id>6</id><course>hadoop</course><year>2015</year></student>
+
+add jar /home/demo/Desktop/project_task/hivexmlserde-1.0.5.3.jar;
+
+CREATE TABLE kalyan.student1_xml(name STRING, id BIGINT, course STRING, year BIGINT)
+ROW FORMAT SERDE 'com.ibm.spss.hive.serde2.xml.XmlSerDe'
+WITH SERDEPROPERTIES (
+"column.xpath.name"="/student/name/text()",
+"column.xpath.id"="/student/id/text()",
+"column.xpath.course"="/student/course/text()",
+"column.xpath.year"="/student/year/text()"
+)
+STORED AS
+INPUTFORMAT 'com.ibm.spss.hive.serde2.xml.XmlInputFormat'
+OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat'
+TBLPROPERTIES (
+"xmlinput.start"="<student>",
+"xmlinput.end"="</student>"
+)
+;
+
+load data local inpath "/home/demo/Desktop/project_task/data/student1.xml" into table kalyan.student1_xml
+
+create table student1_op(name STRING, id BIGINT, course STRING, year BIGINT);
+
+INSERT INTO student1_op (name, id, course, year) SELECT name, id, course, year FROM student1_xml WHERE id>2 and course="spark";
+//////////////////////////////////// 1. HiveTask_1: xml////////////////////////////////////

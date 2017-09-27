@@ -1,0 +1,173 @@
+#################   1. HiveTask_2: using Json DataSet   ###########################################
+
+1.Add the JsonSerde Jar file
+-------------------------------
+add jar /home/demo/Desktop/project_task/jar/hive-serdes-1.0-SNAPSHOT.jar;
+
+hive cli prompt 
+=================
+hive> add jar /home/demo/Desktop/project_task/jar/hive-serdes-1.0-SNAPSHOT.jar;
+Added [/home/demo/Desktop/project_task/jar/hive-serdes-1.0-SNAPSHOT.jar] to class path
+Added resources: [/home/demo/Desktop/project_task/jar/hive-serdes-1.0-SNAPSHOT.jar]
+==========================================================================================
+
+Convert Json Formated Structure
+--------------------------------
+cat student2.json | tr -d '&' | tr '\n' ' ' | tr '\r' ' ' | sed 's| { | \n { |g' | grep -v '^\s*$' > student21.json
+
+more help type command
+tr --help you got the information above code
+
+2. Load the Json Dataset in Hdfs
+--------------------------------
+hadoop fs -mkdir /json
+hadoop fs -put /home/demo/Desktop/project_task/hive_input/student21.json /json2/student21.json
+
+3.Create the Schema Depends upon DataSet
+-----------------------------------------
+CREATE  TABLE namashivayar.student2_json(name string, id int, course string, year int)
+ROW FORMAT SERDE 'com.cloudera.hive.serde.JSONSerDe'
+location '/json2';
+
+hive cli prompt 
+=================
+hive> CREATE EXTERNAL TABLE namashivayar.student2_json(name string, id int, course string, year int)
+    > ROW FORMAT SERDE 'com.cloudera.hive.serde.JSONSerDe'
+    > location '/json2';
+OK
+Time taken: 0.085 seconds
+
+hive> select * from namashivayar.student2_json;
+OK
+anil	1	spark	2016
+venkat	2	spark	2016
+raj	3	spark	2016
+sunil	4	hadoop	2015
+anvith	5	hadoop	2015
+dev	6	hadoop	2015
+Time taken: 0.124 seconds, Fetched: 6 row(s)
+
+4.Create Schema Json Output Table 
+-----------------------------------------
+CREATE EXTERNAL TABLE namashivayar.student2_json_op(name string, id int, course string, year int);
+
+hive cli prompt 
+=================
+hive> CREATE EXTERNAL TABLE namashivayar.student2_json_op(name string, id int, course string, year int);
+OK
+Time taken: 0.108 seconds
+
+5.insert the student2_json_op table from student2_json
+------------------------------------------------------ 
+insert into namashivayar.student2_json_op(name,id, course, year) select name,id, course, year from namashivayar.student2_json where id>2 and course="spark";
+
+hive cli prompt 
+=================
+hive> insert into namashivayar.student2_json_op(name,id, course, year) select name,id, course, year from namashivayar.student2_json where id>2 and course="spark";
+Query ID = demo_20170921230132_8766e1e9-e1b0-4b93-9016-658207b9a83a
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1506006230513_0005, Tracking URL = http://localhost:8088/proxy/application_1506006230513_0005/
+Kill Command = /home/demo/work/hadoop-2.6.0/bin/hadoop job  -kill job_1506006230513_0005
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2017-09-21 23:01:39,459 Stage-1 map = 0%,  reduce = 0%
+2017-09-21 23:01:46,826 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 2.71 sec
+MapReduce Total cumulative CPU time: 2 seconds 710 msec
+Ended Job = job_1506006230513_0005
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://localhost:8020/home/demo/work/warehouse/namashivayar.db/student2_json_op/.hive-staging_hive_2017-09-21_23-01-32_381_4981617470310864651-1/-ext-10000
+Loading data to table namashivayar.student2_json_op
+Table namashivayar.student2_json_op stats: [numFiles=1, numRows=1, totalSize=17, rawDataSize=16]
+MapReduce Jobs Launched: 
+Stage-Stage-1: Map: 1   Cumulative CPU: 2.71 sec   HDFS Read: 4514 HDFS Write: 96 SUCCESS
+Total MapReduce CPU Time Spent: 2 seconds 710 msec
+OK
+Time taken: 15.857 seconds
+
+6.verify the student2_json_op table 
+------------------------------------
+
+select * from namashivayar.student2_json_op;
+
+hive cli prompt 
+=================
+
+hive> select * from namashivayar.student2_json_op;
+OK
+raj	3	spark	2016
+Time taken: 0.25 seconds, Fetched: 1 row(s)
+
+
+
+#################################################################################################################################
+
+
+//////////////////////////////////// 1. HiveTask_2: using xml////////////////////////////////////
+<student><name>anil</name><id>1</id><course>spark</course><year>2016</year></student>
+<student><name>venkat</name><id>2</id><course>spark</course><year>2016</year></student>
+<student><name>raj</name><id>3</id><course>spark</course><year>2016</year></student>
+<student><name>sunil</name><id>4</id><course>hadoop</course><year>2015</year></student>
+<student><name>anvith</name><id>5</id><course>hadoop</course><year>2015</year></student>
+<student><name>dev</name><id>6</id><course>hadoop</course><year>2015</year></student>
+
+1.Add the JsonSerde Jar file
+-------------------------------
+create database namashivayar;
+use namashivayar;
+add jar /home/demo/Desktop/project_task/jar/hivexmlserde-1.0.5.3.jar;
+
+2. Load the Json Dataset in Hdfs
+--------------------------------
+hadoop fs -mkdir /xml
+hadoop fs -put /home/demo/Desktop/project_task/hive_input/student2.xml /xml/student2.xml
+
+
+4.Create Schema Json Output Table 
+-----------------------------------------
+
+CREATE EXTERNAL TABLE namashivayar.student2_xml(name string, id int, course string, year int)
+ROW FORMAT SERDE 'com.ibm.spss.hive.serde2.xml.XmlSerDe'
+WITH SERDEPROPERTIES (
+"column.xpath.name"="/student/name/text()",
+"column.xpath.id"="/student/id/text()",
+"column.xpath.course"="/student/course/text()",
+"column.xpath.year"="/student/year/text()"
+)
+STORED AS
+INPUTFORMAT 'com.ibm.spss.hive.serde2.xml.XmlInputFormat'
+OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat'
+location '/xml'
+TBLPROPERTIES (
+"xmlinput.start"="<student>",
+"xmlinput.end"="</student>"
+);
+
+4.Load the data in to Table 
+-----------------------------------------
+load data inpath "/xml/student2.xml" into table namashivayar.student2_xml
+
+5.Create Schema Json Output Table 
+-----------------------------------------
+CREATE EXTERNAL TABLE student2_op(name string, id int, course string, year int);
+
+6.insert the student2_json_op table from student2_op
+------------------------------------------------------ 
+
+INSERT INTO student2_op (name, id, course, year) SELECT name, id, course, year FROM student2_xml WHERE id>2 and course="spark";
+
+7.verify the student2_op table 
+------------------------------------
+select * from student2_op;
+
+//////////////////////////////////// 1. HiveTask_2: xml DataSet////////////////////////////////////
+
+
+
+
+
+
+
+

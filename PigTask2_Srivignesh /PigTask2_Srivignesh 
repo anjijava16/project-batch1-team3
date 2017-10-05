@@ -1,0 +1,16 @@
+REGISTER /jar/piggybank.jar  
+
+DEFINE XPath org.apache.pig.piggybank.evaluation.xml.XPath();
+
+student2_xml =  LOAD '/home/demo/Desktop/project_task/pig_input/student2.xml' using org.apache.pig.piggybank.storage.XMLLoader('student') as (x:chararray);
+
+records_op = FOREACH student1_xml GENERATE XPath(x, 'student/name'), XPath(x, 'student/id'), XPath(x, 'student/course'), XPath(x, 'student/year');
+
+records_op1 = foreach records_op generate $0 as name, (int) $1 as id,$2 as course,(int) $3 as year;
+
+student2_op = FILTER records_op1 BY id > 2 AND course=='spark';
+
+DUMP student2_op; 
+ 
+store student2_op into '/user/orienit/pig/student2_op' using PigStorage(':');
+

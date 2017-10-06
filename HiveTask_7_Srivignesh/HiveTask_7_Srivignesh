@@ -1,8 +1,9 @@
 hadoop fs -put /home/demo/Desktop/project_task/hive_input/Behavioral_Risk_Factor_Surveillance_System.csv /csv/Behavioral_Risk_Factor_Surveillance_System.csv
 
+hive> add jar /home/demo/Downloads/jar_files/hive-serde-0.14.0.jar;
 
 
-CREATE TABLE RiskFactor(
+CREATE EXTERNAL TABLE RiskFactor(
 YearStart int,YearEnd int,LocationAbbr string,LocationDesc string,Datasource string,Class string,Topic string,Question string,Data_Value_Unit string,Data_Value_Type string,Data_Value int ,Data_Value_Alt int,Data_Value_Footnote_Symbol string
 ,Data_Value_Footnote string,Low_Confidence_Limit int,High_Confidence_Limit int,Sample_Size int,Total string,Ageyears string
 ,Education string,Gender string,Income string,RaceEthnicity string,GeoLocation string,ClassID string,TopicID string,QuestionID string
@@ -10,12 +11,13 @@ YearStart int,YearEnd int,LocationAbbr string,LocationDesc string,Datasource str
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 STORED AS INPUTFORMAT 'org.apache.hadoop.mapred.TextInputFormat' 
 OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat' 
-LOCATION '/csv';
+LOCATION '/csv'
+tblproperties("skip.header.line.count"="1");
 
 
 set hive.exec.dynamic.partition.mode=nonstrict;
 
-CREATE TABLE IF NOT EXISTS RiskFactorPartition (YearStart int,LocationAbbr string,Datasource string,Class string,Topic string,Question string,Data_Value_Unit string,Data_Value_Type string,Data_Value int ,Data_Value_Alt int,Data_Value_Footnote_Symbol string
+CREATE EXTERNAL TABLE IF NOT EXISTS RiskFactorPartition (YearStart int,LocationAbbr string,Datasource string,Class string,Topic string,Question string,Data_Value_Unit string,Data_Value_Type string,Data_Value int ,Data_Value_Alt int,Data_Value_Footnote_Symbol string
 ,Data_Value_Footnote string,Low_Confidence_Limit int,High_Confidence_Limit int,Sample_Size int,Total string,Ageyears string
 ,Education string,Gender string,Income string,RaceEthnicity string,ClassID string,TopicID string,QuestionID string
 ,DataValueTypeID string,LocationID int,StratificationCategory1 string,Stratification1 string,StratificationCategoryId1 string,StratificationID1 string) 

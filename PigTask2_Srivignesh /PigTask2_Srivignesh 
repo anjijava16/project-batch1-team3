@@ -1,8 +1,12 @@
+hadoop fs -mkdir -p hdfs://localhost:8020/user/demo/pigxmlinput
+
+hadoop fs -put /home/demo/Desktop/project_task/pig_input/student2.xml hdfs://localhost:8020/user/demo/pigxmlinput/student2.xml
+
 REGISTER /jar/piggybank.jar  
 
 DEFINE XPath org.apache.pig.piggybank.evaluation.xml.XPath();
 
-student2_xml =  LOAD '/home/demo/Desktop/project_task/pig_input/student2.xml' using org.apache.pig.piggybank.storage.XMLLoader('student') as (x:chararray);
+student2_xml =  LOAD 'pigxmlinput/student2.xml' using org.apache.pig.piggybank.storage.XMLLoader('student') as (x:chararray);
 
 records_op = FOREACH student1_xml GENERATE XPath(x, 'student/name'), XPath(x, 'student/id'), XPath(x, 'student/course'), XPath(x, 'student/year');
 

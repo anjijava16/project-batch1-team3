@@ -1,0 +1,22 @@
+hadoop fs -put student.json /home/cloudera/
+records = load '/home/cloudera/student.json'  USING JsonLoader('name:chararray,id:int, COURSE:chararray, year:int');
+describe records;
+dump records;
+student1_op = FILTER records BY $1 >2 and $2=='spark';
+STORE student1_op INTO '/home/cloudera/student1_op_json';
+
+
+hadoop fs -put student.xml /home/cloudera/
+hadoop fs -put piggybank-0.15.0.jar /home/cloudera/
+
+REGISTER 'hdfs:////home/cloudera/piggybank-0.15.0.jar'
+
+DEFINE XPath org.apache.pig.piggybank.evaluation.xml.XPath(); 
+A =  LOAD '/home/cloudera/student.xml' using org.apache.pig.piggybank.storage.XMLLoader('student') as (x:chararray); 
+B = FOREACH A GENERATE XPath(x, 'student/name'), XPath(x, 'student/id'),XPath(x, 'student/course'), XPath(x, 'student/year');
+dump B;
+student1_op_xml = FILTER B BY (int)$1 >2 and $2=='spark';
+STORE student1_op_xml INTO '/home/cloudera/student1_op_xml';
+
+
+

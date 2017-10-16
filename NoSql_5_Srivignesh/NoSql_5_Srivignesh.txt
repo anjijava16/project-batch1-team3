@@ -1,0 +1,8 @@
+mongoimport --db kalyan --collection student1_json --file /home/orienit/Desktop/nosql_input/student1.json
+mongoexport --db kalyan --collection student1_json --out /user/orienit/kalyan/mongodb/student1_json_op1/student2.json
+
+mongoexport --db kalyan --collection student1_json --type=csv --fields "id,name,course,year" --out /user/orienit/kalyan/mongodb/student1_csv_op1/student3.csv
+
+mongoexport --db kalyan --collection student1_json --fields "name,id" --out /user/orienit/kalyan/mongodb/student1_json_op2/student7.json
+
+mongoexport --db kalyan --collection student1_json --type=csv --fields "name,id" --out /user/orienit/kalyan/mongodb/student1_csv_op2/student5.csv

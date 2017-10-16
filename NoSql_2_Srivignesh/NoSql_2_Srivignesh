@@ -1,0 +1,9 @@
+hbase org.apache.hadoop.hbase.mapreduce.Export "student1_csv" "/user/orienit/kalyan/hbase/student1_csv"
+hbase org.apache.hadoop.hbase.mapreduce.Export "student1_tsv" "/user/orienit/kalyan/hbase/student1_tsv"
+
+create 'student1_csv1','cf'
+create 'student1_tsv1','cf'
+
+hbase org.apache.hadoop.hbase.mapreduce.Import -Dimport.columns=cf:name,HBASE_ROW_KEY,cf:course,cf:year student1_csv1 hdfs://localhost:8020/user/orienit/kalyan/hbase/student1_csv/part-m-00000
+
+hbase org.apache.hadoop.hbase.mapreduce.Import -Dimport.columns=cf:name,HBASE_ROW_KEY,cf:course,cf:year student1_tsv1 hdfs://localhost:8020/user/orienit/kalyan/hbase/student1_tsv/part-m-00000

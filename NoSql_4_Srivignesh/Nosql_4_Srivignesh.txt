@@ -1,0 +1,11 @@
+mongoimport --db kalyan --collection student1 --file /home/demo/Desktop/nosql_input/student1.json
+mongoimport --db kalyan --collection student2 --file /home/demo/Desktop/nosql_input/student2.json
+mongoimport --db kalyan --collection student3 --file /home/demo/Desktop/nosql_input/student3.json
+
+mongoexport --db kalyan --collection student1 --query '{$and:[{ id: { $gt: 2 } },{course:"spark"}]}' --out /user/orienit/kalyan/mongodb/student1_op/student1.json
+mongoexport --db kalyan --collection student2 --query '{$and:[{ id: { $gt: 2 } },{course:"spark"}]}' --out /user/orienit/kalyan/mongodb/student1_op/student2.json
+mongoexport --db kalyan --collection student3 --query '{$and:[{ id: { $gt: 2 } },{course:"spark"}]}' --out /user/orienit/kalyan/mongodb/student1_op/student3.json
+
+
+
+

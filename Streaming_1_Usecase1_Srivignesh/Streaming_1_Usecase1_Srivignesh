@@ -1,0 +1,14 @@
+$FLUME_HOME/bin/flume-ng agent -n agent --conf $FLUME_HOME/conf -f $FLUME_HOME/conf/kalyan-twitter-hdfs-mongo-agent.conf -Dflume.root.logger=DEBUG,console
+
+add jar /home/demo/work/apache-hive-1.2.1-bin/lib/hive-serdes-1.0-SNAPSHOT.jar;
+create external table twitter(text STRING) ROW FORMAT SERDE 'com.cloudera.hive.serde.JSONSerDe' LOCATION '/user/flume/tweets';
+select * from twitter;
+hadoop fs -put /home/demo/Downloads/sentimentanalysis-hive.jar hdfs://localhost:8020/kalyan/sentimentanalysis/hive/sentimentanalysis-hive.jar
+
+ADD JAR hdfs://localhost:8020/kalyan/sentimentanalysis/hive/sentimentanalysis-hive.jar;
+
+CREATE TEMPORARY FUNCTION sentiment AS 'com.orienit.kalyan.sentimentanalysis.hive.udf.SentimentUdf';
+
+CREATE FUNCTION kalyan.sentiment AS 'com.orienit.kalyan.sentimentanalysis.hive.udf.SentimentUdf' USING JAR 'hdfs://localhost:8020/kalyan/sentimentanalysis/hive/sentimentanalysis-hive.jar';
+
+SELECT text, sentiment(text) FROM kalyan.twitter;

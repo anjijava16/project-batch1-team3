@@ -1,0 +1,29 @@
+Sample Data:
+-------------
+anil,1,spark,2016
+venkat,2,spark,2016
+raj,3,spark,2016
+sunil,4,hadoop,2015
+anvith,5,hadoop,2015
+dev,6,hadoop,2015
+
+
+Requirement:
+-------------
+Needed 'id' as primary key
+
+steps:
+---------
+hive> create table student_dump(name string,id int,course string,year int)
+    > row format delimited fields terminated by ',';
+
+
+hive>create table student_hive(id int,name string,course string,year int)
+     STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+     WITH SERDEPROPERTIES ("hbase.columns.mapping" = ":key,cf1:name,cf1:course,cf1:year")
+     TBLPROPERTIES ("hbase.table.name" = "student_hbase");
+
+
+hive>insert overwrite table student_hive select id,name,course,year from student_dump;
+
+hive>select * from student_hive;

@@ -17,26 +17,10 @@ LOCATION '/csv'
 tblproperties("skip.header.line.count"="1",'serialization.null.format'='');
 
 
-set hive.exec.dynamic.partition.mode=nonstrict;
-
-CREATE EXTERNAL TABLE IF NOT EXISTS RiskFactorPartition (YearStart int,LocationAbbr string,Datasource string,Class string,Topic string,Question string,Data_Value_Unit string,Data_Value_Type string,Data_Value int ,Data_Value_Alt int,Data_Value_Footnote_Symbol string
-,Data_Value_Footnote string,Low_Confidence_Limit int,High_Confidence_Limit int,Sample_Size int,Total string,Ageyears string
-,Education string,Gender string,Income string,RaceEthnicity string,ClassID string,TopicID string,QuestionID string
-,DataValueTypeID string,LocationID int,StratificationCategory1 string,Stratification1 string,StratificationCategoryId1 string,StratificationID1 string) 
-PARTITIONED BY ( YearEnd int , LocationDesc string,GeoLocation string)
-ROW FORMAT DELIMITED
-FIELDS TERMINATED BY '\t'
-LINES TERMINATED BY '\n'
-STORED AS TEXTFILE
-;
-
-INSERT OVERWRITE TABLE RiskFactorPartition PARTITION(YearEnd,LocationDesc,GeoLocation) select * from RiskFactor;
-
-SHOW PARTITIONS RiskFactorPartition;
-
 pig -useHCatalog;
 
 A = load 'kalyan.riskfactor' using org.apache.hive.hcatalog.pig.HCatLoader();
+
 
 records_op3 = foreach A generate (int) yearstart as yearstart,(int) yearend as yearend ,(chararray) locationabbr as locationabbr  ,(chararray) locationdesc as locationdesc,(chararray) datasource as datasource,(chararray) class as class,(chararray) topic as topic,(chararray) question as question ,(chararray) data_value_unit as data_value_unit,(chararray) data_value_type as data_value_type,(double) data_value as data_value,(double) data_value_alt as data_value_alt,(chararray) data_value_footnote_symbol as data_value_footnote_symbol,(chararray) data_value_footnote as data_value_footnote,(double) low_confidence_limit as low_confidence_limit,(double) high_confidence_limit as high_confidence_limit,(int) sample_size as sample_size,(chararray) total as total,(chararray) ageyears as ageyears,(chararray) education as education,(chararray) gender as gender,(chararray) income as income,(chararray) raceethnicity as raceethnicity,(chararray) geolocation as geolocation,(chararray) classid as classid,(chararray) topicid as topicid,(chararray) questionid as questionid,(chararray) datavaluetypeid as datavaluetypeid,(int) locationid as locationid ,(chararray) stratificationcategory1 as stratificationcategory1,(chararray) stratification1 as stratification1,(chararray) stratificationcategoryid1 as stratificationcategoryid1,(chararray) stratificationid1 as stratificationid1; 
 
@@ -45,8 +29,7 @@ A_CLEAN = FILTER records_op3 BY NOT((yearstart IS NULL) AND (locationabbr IS NUL
 
 
 top_inf9 = FILTER A_CLEAN BY sample_size > 1000;
-output1 = FILTER top_inf9 BY ageyears == '45 - 54';
-RiskFactorFilter = FILTER output1 BY ageyears == '45 - 54';
+RiskFactorFilter = FILTER top_inf9 BY (ageyears == '35 - 44' or ageyears == '45 - 54');
 
 dump RiskFactorFilter;
 

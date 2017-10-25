@@ -1,0 +1,110 @@
+hadoop fs -mkdir /csv
+hadoop fs -put /home/orienit/Desktop/project_task/hive_input/Behavioral_Risk_Factor_Surveillance_System.csv /csv/Behavioral_Risk_Factor_Surveillance_System.csv
+
+hadoop fs -cat /csv/Behavioral_Risk_Factor_Surveillance_System.csv
+hive> add jar /home/demo/Downloads/jar_files/hive-serde-0.14.0.jar;
+
+
+CREATE EXTERNAL TABLE RiskFactor(
+YearStart int,YearEnd int,LocationAbbr string,LocationDesc string,Datasource string,Class string,Topic string,Question string,Data_Value_Unit string,Data_Value_Type string,Data_Value int ,Data_Value_Alt int,Data_Value_Footnote_Symbol string
+,Data_Value_Footnote string,Low_Confidence_Limit int,High_Confidence_Limit int,Sample_Size int,Total string,Ageyears string
+,Education string,Gender string,Income string,RaceEthnicity string,GeoLocation string,ClassID string,TopicID string,QuestionID string
+,DataValueTypeID string,LocationID int,StratificationCategory1 string,Stratification1 string,StratificationCategoryId1 string,StratificationID1 string)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+STORED AS INPUTFORMAT 'org.apache.hadoop.mapred.TextInputFormat' 
+OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat' 
+LOCATION '/csv'
+tblproperties("skip.header.line.count"="1",'serialization.null.format'='');
+
+
+pig -useHCatalog;
+
+A = load 'kalyan.riskfactor' using org.apache.hive.hcatalog.pig.HCatLoader();
+
+
+records_op3 = foreach A generate (int) yearstart as yearstart,(int) yearend as yearend ,(chararray) locationabbr as locationabbr  ,(chararray) locationdesc as locationdesc,(chararray) datasource as datasource,(chararray) class as class,(chararray) topic as topic,(chararray) question as question ,(chararray) data_value_unit as data_value_unit,(chararray) data_value_type as data_value_type,(double) data_value as data_value,(double) data_value_alt as data_value_alt,(chararray) data_value_footnote_symbol as data_value_footnote_symbol,(chararray) data_value_footnote as data_value_footnote,(double) low_confidence_limit as low_confidence_limit,(double) high_confidence_limit as high_confidence_limit,(int) sample_size as sample_size,(chararray) total as total,(chararray) ageyears as ageyears,(chararray) education as education,(chararray) gender as gender,(chararray) income as income,(chararray) raceethnicity as raceethnicity,(chararray) geolocation as geolocation,(chararray) classid as classid,(chararray) topicid as topicid,(chararray) questionid as questionid,(chararray) datavaluetypeid as datavaluetypeid,(int) locationid as locationid ,(chararray) stratificationcategory1 as stratificationcategory1,(chararray) stratification1 as stratification1,(chararray) stratificationcategoryid1 as stratificationcategoryid1,(chararray) stratificationid1 as stratificationid1; 
+
+A_CLEAN = FILTER records_op3 BY NOT((yearstart IS NULL) AND (locationabbr IS NULL) AND (yearend IS NULL) AND (locationdesc IS NULL) AND (datasource IS NULL) AND (class IS NULL) AND (question IS NULL) AND (data_value_unit IS NULL) AND (topic IS NULL) AND (data_value_type IS NULL) AND (data_value IS NULL) AND (data_value_alt IS NULL) AND (data_value_footnote_symbol IS NULL) AND (data_value_footnote IS NULL) AND (low_confidence_limit IS NULL) AND (high_confidence_limit IS NULL) AND (sample_size IS NULL) AND (ageyears IS NULL) AND (education IS NULL) AND (income IS NULL) AND (total IS NULL) AND (gender IS NULL) AND (raceethnicity IS NULL) AND (geolocation IS NULL) AND (classid IS NULL) AND (topicid IS NULL) AND (questionid IS NULL) AND (datavaluetypeid IS NULL) AND (locationid IS NULL) AND (stratificationcategory1 IS NULL) AND (stratification1 IS NULL) AND (stratificationcategoryid1 IS NULL) AND (stratificationid1 IS NULL));
+
+
+
+top_inf9 = FILTER A_CLEAN BY sample_size > 1000;
+RiskFactorFilter = FILTER top_inf9 BY (ageyears == '35 - 44' or ageyears == '45 - 54');
+
+dump RiskFactorFilter;
+
+STORE RiskFactorFilter INTO '/user/orienit/pig/RiskFactorFilter'; 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+

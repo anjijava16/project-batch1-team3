@@ -1,0 +1,20 @@
+hadoop fs -mkdir -p hdfs://localhost:8020/user/demo/pigxmlinput
+
+hadoop fs -put /home/demo/Desktop/project_task/pig_input/student4.xml hdfs://localhost:8020/user/demo/pigxmlinput/student4.xml
+
+REGISTER /jar/piggybank.jar  
+
+DEFINE XPath org.apache.pig.piggybank.evaluation.xml.XPath();
+
+student4 =  LOAD 'pigxmlinput/student4.xml' using org.apache.pig.piggybank.storage.XMLLoader('student') as (x:chararray);
+
+records_op = FOREACH records GENERATE XPath(x, 'student/name'), XPath(x, 'student/id'), XPath(x, 'student/course'), XPath(x, 'student/year'), XPath(x, 'student/details/address'), XPath(x, 'student/details/pincode');
+
+records_op1 = foreach records_op generate $0 as name, (int) $1 as id,$2 as course,(int) $3 as year,$4 as address,(int) $5 as pincode;
+
+student4_op = FILTER records_op1 BY id > 2 AND (address=='hyderabad' or address=='banglore');
+
+DUMP student4_op; 
+ 
+store filtered_records into '/user/orienit/pig/student4_op' using PigStorage(':');
+

@@ -1,0 +1,26 @@
+hadoop fs -mkdir -p hdfs://quickstart.cloudera:8020/user/orienit/pig/xmlinput2
+
+hadoop fs -put /home/orienit/Desktop/project_task/pig_input/student2.xml hdfs://quickstart.cloudera:8020/user/orienit/pig/xmlinput2/student2.xml
+
+hadoop fs -mkdir hdfs://quickstart.cloudera:8020/jar
+
+hadoop fs -put piggybank.jar hdfs://quickstart.cloudera:8020/jar/piggybank.jar
+
+REGISTER hdfs://quickstart.cloudera:8020/jar/piggybank.jar;
+
+DEFINE XPath org.apache.pig.piggybank.evaluation.xml.XPath();
+
+student2_xml =  LOAD 'xmlinput2/student2.xml' using org.apache.pig.piggybank.storage.XMLLoader('student') as (x:chararray);
+
+records_op = FOREACH student1_xml GENERATE XPath(x, 'student/name'), XPath(x, 'student/id'), XPath(x, 'student/course'), XPath(x, 'student/year');
+
+records_op1 = foreach records_op generate $0 as name, (int) $1 as id,$2 as course,(int) $3 as year;
+
+student2_op = FILTER records_op1 BY id > 2 AND course=='spark';
+
+DUMP student2_op; 
+ 
+store student2_op into '/user/orienit/pig/student2_op' using PigStorage(':');
+
+hadoop fs -cat /user/orienit/pig/student2_op/part-m-00000
+

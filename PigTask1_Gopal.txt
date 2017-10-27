@@ -1,8 +1,12 @@
-hadoop fs -mkdir -p hdfs://localhost:8020/user/demo/pig/xmlinput1/student1.xml
+hadoop fs -mkdir -p hdfs://quickstart.cloudera:8020/user/orienit/pig/xmlinput1
 
-hadoop fs -put /home/demo/Desktop/project_task/pig_input/student1.xml hdfs://localhost:8020/user/demo/pig/xmlinput1/student1.xml
+hadoop fs -put /home/orienit/Desktop/project_task/pig_input/student1.xml hdfs://quickstart.cloudera:8020/user/orienit/pig/xmlinput1/student1.xml
 
-REGISTER /jar/piggybank.jar  
+hadoop fs -mkdir hdfs://quickstart.cloudera:8020/jar
+
+hadoop fs -put piggybank.jar hdfs://quickstart.cloudera:8020/jar/piggybank.jar
+
+REGISTER hdfs://quickstart.cloudera:8020/jar/piggybank.jar;
 
 DEFINE XPath org.apache.pig.piggybank.evaluation.xml.XPath();
 
@@ -17,4 +21,3 @@ student1_op = FILTER records_op1 BY id > 2 AND course=='spark';
 DUMP student1_op; 
  
 store student1_op into '/user/orienit/pig/student1_op' using PigStorage(':');
-

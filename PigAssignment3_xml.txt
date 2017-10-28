@@ -1,0 +1,12 @@
+hadoop fs -put student3.xml /user/cloudera/
+hadoop fs -put piggybank-0.15.0.jar /user/cloudera/
+REGISTER 'hdfs:////user/cloudera/piggybank-0.15.0.jar'
+DEFINE XPath org.apache.pig.piggybank.evaluation.xml.XPath();
+A =  LOAD '/user/cloudera/student3.xml' using org.apache.pig.piggybank.storage.XMLLoader('student') as (x:chararray); 
+B = FOREACH A GENERATE XPath(x, 'student/name'), XPath(x, 'student/id'),XPath(x, 'student/course'), XPath(x, 'student/year'), 
+XPath(x, 'student/details/address'),XPath(x, 'student/details/pincode');
+dump B;
+student3_output = foreach B generate $0 as name, (int) $1 as id,$2 as course,(int) $3 as year,$4 as address,(int) $5 as pincode;
+std3_output_xml = FILTER student3_output BY id > 2 AND address=='hyderabad';
+DUMP std3_output_xml; 
+ 

@@ -1,0 +1,58 @@
+hadoop fs -put Behavioral_Risk_Factor_Surveillance_System.csv /user/cloudera;
+
+use kalyan;
+
+drop table riskfactor;
+
+CREATE EXTERNAL TABLE riskfactor (
+  yearstart int,
+  yearend int,
+  locationabbr string,
+  locationdesc string,
+  datasource string,
+  class string,
+  topic string,
+  question string,
+  data_value_unit string,
+  data_value_type string,
+  data_value int,
+  data_value_alt int,
+  data_value_footnote_symbol string,
+  data_value_footnote string,
+  low_confidence_limit decimal,
+  high_confidence_limit decimal,
+  sample_size_total int,
+  age_in_years string,
+  education string,
+  gender string,
+  income string,
+  race_ethnicity string,
+  geolocation decimal,
+  classid string,
+  topicid string,
+  questionid string,
+  datavaluetypeid string,
+  locationid int,
+  stratificationcategory1 string,
+  stratification1 string,
+  stratificationcategoryid1 string,
+  stratificationid1 string
+)
+row format delimited fields terminated by ',';
+--tblproperties("skip.header.line.count"="1"); 
+
+LOAD DATA INPATH '/user/cloudera/Behavioral_Risk_Factor_Surveillance_System.csv' OVERWRITE INTO TABLE riskfactor;
+
+
+pig -useHCatalog;
+A = load 'kalyan.riskfactor' using org.apache.hive.hcatalog.pig.HCatLoader();
+B = FILTER A BY $18!='' AND $18!='65 or older';
+C = FOREACH B GENERATE *,FLATTEN(STRSPLIT($18,' - ')) AS (minage:chararray,maxage:chararray);
+D = FILTER C BY (int)minage>=40 and (int)maxage <= 55;
+dump D;
+--D = FILTER C BY (int)minage>=40 and (int)maxage <= 50 and (int)$17>=1000;
+--Below is to see the data in group by 
+records = group D by (minage,maxage);
+B1 = foreach records generate group,COUNT(D);
+dump B1;
+

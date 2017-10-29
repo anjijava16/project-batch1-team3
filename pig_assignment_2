@@ -1,0 +1,9 @@
+XML DATA:
+-----------------
+
+REGISTER '/home/orienit/Desktop/pig_ass_working/piggybank-0.15.0.jar'
+DEFINE XPath org.apache.pig.piggybank.evaluation.xml.XPath();
+A = load 'file:///home/orienit/Desktop/pig/student2.xml' using org.apache.pig.piggybank.storage.XMLLoader('student') as (sdata:chararray);
+B = foreach  A GENERATE XPath(sdata,'student/name') as name,XPath(sdata,'student/id') as id,XPath(sdata,'student/course') as course,XPath(sdata,'student/year') as year;
+C = filter B by course=='spark' and (int)id>2;
+STORE C INTO 'file:///home/orienit/Desktop/pig_ass_working/op2xml'

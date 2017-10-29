@@ -1,0 +1,22 @@
+JSON
+--------
+STILL WORKING ON THIS:
+-----------------------
+A = load '/home/orienit/Desktop/pig/student3.json' using JsonLoader('name:chararray,id:int,course:chararray,year:int,details:{(address:chararray,pincode:double)}')
+
+
+
+
+
+
+XML
+--------
+REGISTER /home/orienit/Desktop/pig_ass_working/piggybank-0.15.0.jar;
+DEFINE XPath org.apache.pig.piggybank.evaluation.xml.XPath();
+A = load '/home/orienit/Desktop/pig/student3.xml' using org.apache.pig.piggybank.storage.XMLLoader('student') as (sdata:chararray);
+B = FOREACH A GENERATE XPath(sdata, 'student/name') as name, XPath(sdata, 'student/id') as id, XPath(sdata, 'student/course') as course, XPath(sdata, 'student/year') as year, XPath(sdata, 'student/details/address') as address, XPath(sdata, 'student/details/pincode') as pincode;
+dump B;
+C = FILTER B by (int)id>2 and address=='hyderabad';
+dump C;
+STORE C INTO 'student3_op';
+
